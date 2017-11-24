@@ -15,17 +15,17 @@ class BaseModel(object):
         self._modularity = 0.0
         self._degree = {}
         self._m = 0.0
+        self._baseEdge = []
 
         for e in self._edge:
             if e._startPoint not in self._node:
                 self._node.append(e._startPoint)
             if e._endPoint not in self._node:
                 self._node.append(e._endPoint)
-            try:
-                self._m += e._weight
-            except Exception, t:
-                print type(e._weight)
-
+            self._m += e._weight
+            self._baseEdge.append((e._startPoint, e._endPoint))
+            self._baseEdge.append((e._endPoint, e._startPoint))
+        self.UpdateDegree()
 
     def SumWeightOfUV(self, startPoint, endPoint):
         if len(self._edge) == 0:
@@ -53,20 +53,31 @@ class BaseModel(object):
                 self._degree[e._startPoint] += e._weight
             else:
                 self._degree[e._startPoint] = e._weight
+            if e._endPoint in self._degree:
+                self._degree[e._endPoint] += e._weight
+            else:
+                self._degree[e._endPoint] = e._weight
 
     def UpdateCluster(self):
         import Tool.UnionSet
 
         unionSet = Tool.UnionSet.UnionSet()
-        nodelist = []
+        self._nodelist = []
 
         for _ in self._node:
-            nodelist.append(Tool.UnionSet.BaseNode(value=_))
+            self._nodelist.append(Tool.UnionSet.BaseNode(value=_))
 
         for e in self._edge:
-            na = nodelist.index(e._startPoint)
-            nb = nodelist.index(e._endPoint)
-            unionSet.Union(nodelist[na], nodelist[nb])
+            na = filter(lambda x: x._value == e._startPoint, self._nodelist)[0]
+            # na = nodelist.index(e._startPoint)
+            nb = filter(lambda x: x._value == e._endPoint, self._nodelist)[0]
+            # nb = nodelist.index(e._endPoint)
+            try:
+                unionSet.Union(na, nb)
+            except Exception, error:
+                # print error
+                print type(na), type(nb)
+                # print na, nb
 
         # self._cluster = {}
         #
@@ -85,18 +96,27 @@ class BaseModel(object):
 
         unionSet = Tool.UnionSet.UnionSet()
 
-        if unionSet.Find(nodeA) == unionSet.Find(nodeB):
+        na = filter(lambda x: x._value == nodeA, self._nodelist)[0]
+        nb = filter(lambda x: x._value == nodeB, self._nodelist)[0]
+
+        if unionSet.Find(na) == unionSet.Find(nb):
             return True
         return False
 
     def GetModularity(self):
-        self.UpdateDegree()
+        # self.UpdateDegree()
         self.UpdateCluster()
         self._modularity = 0.0
+
         for i in self._node:
             for j in self._node:
-                if i != j and self.JudgeSameCluster(i, j):
-                    aij = self.SumWeightOfUV(startPoint=i, endPoint=j)
-                    self._modularity += aij - ((self._degree[i] * self._degree[j]) / (2.0 * self._m))
+                if self.JudgeSameCluster(i, j):
+                    # aij = self.SumWeightOfUV(startPoint=i, endPoint=j)
+                    if (i, j) in self._baseEdge or (j, i) in self._baseEdge:
+                        aij = self.SumWeightOfUV(startPoint=i, endPoint=j)
+                        self._modularity += aij - ((self._degree[i] * self._degree[j]) / (2.0 * self._m))
+                    else:
+                        self._modularity -= ((self._degree[i] * self._degree[j]) / (2.0 * self._m))
         self._modularity /= (2.0 * self._m)
+        # print self._modularity
         return self._modularity

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 class MyEdge(object):
-    def __init__(self, startPoint, endPoint, weight, pheromone = 0, display = 0):
+    def __init__(self, startPoint, endPoint, weight, pheromone = 1., display = 1.):
         '''
         init function of MyEdge
         '''

@@ -6,7 +6,7 @@ class BaseNode(object):
         init function of BaseNode
         '''
         self._value = value
-        self._father = value
+        self._father = self
         self._rank = 1
 
 class UnionSet(object):
@@ -17,7 +17,7 @@ class UnionSet(object):
         pass
 
     def Find(self, nodeA):
-        if nodeA._father != nodeA._value:
+        if nodeA._father != nodeA:
             nodeA._father = self.Find(nodeA._father)
         return nodeA._father
 
@@ -26,9 +26,14 @@ class UnionSet(object):
         fb = self.Find(nodeB)
 
         if fa != fb:
-            if fa._rank >= fb._rank:
-                fa._rank += fb._rank
-                nodeB._father = nodeA._value
-            else:
-                fb._rank += fa._rank
-                nodeA._father = nodeB._value
+            try:
+                if fa._rank >= fb._rank:
+                    fa._rank += fb._rank
+                    nodeB._father = nodeA
+                else:
+                    fb._rank += fa._rank
+                    nodeA._father = nodeB
+            except Exception, e:
+                print e
+                print fa, fb
+                print type(fa), type(fb)

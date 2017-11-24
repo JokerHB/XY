@@ -10,16 +10,19 @@ class AutoGenerate(object):
     @staticmethod
     def Generate(nodeSize, edgeSize, filepath):
         preList = ''
+        listOfEdge = []
         from random import randint
         from random import random
         for i in range(edgeSize):
             sp = randint(0, nodeSize)
             ep = randint(0, nodeSize)
-            while sp == ep:
+            while sp == ep or (sp, ep) in listOfEdge or (ep, sp) in listOfEdge:
                 sp = randint(0, edgeSize)
                 ep = randint(0, edgeSize)
             # preList.append((sp, ep, random()))
             preList += '%d\t%d\t%f\n' % (sp, ep, random())
+            listOfEdge.append((sp, ep))
+            listOfEdge.append((ep, sp))
 
         f = open(filepath, 'wb')
         f.write(preList)
@@ -41,6 +44,7 @@ class AutoGenerate(object):
             # print info.group(0)
             if info != None:
                 edge = Simulate.MyEdge.MyEdge(info.group(1), info.group(2), info.group(3))
+                # edge = Simulate.MyEdge.MyEdge(info.group(2), info.group(1), info.group(3))
                 edges.append(edge)
                 # print info.group(1), info.group(2), info.group(3)
         # print len(edges)
