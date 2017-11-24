@@ -26,14 +26,9 @@ class UnionSet(object):
         fb = self.Find(nodeB)
 
         if fa != fb:
-            try:
-                if fa._rank >= fb._rank:
-                    fa._rank += fb._rank
-                    nodeB._father = nodeA
-                else:
-                    fb._rank += fa._rank
-                    nodeA._father = nodeB
-            except Exception, e:
-                print e
-                print fa, fb
-                print type(fa), type(fb)
+            if fa._rank >= fb._rank:
+                fa._rank += fb._rank
+                nodeB._father = nodeA
+            else:
+                fb._rank += fa._rank
+                nodeA._father = nodeB

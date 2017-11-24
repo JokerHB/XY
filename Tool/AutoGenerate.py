@@ -14,11 +14,11 @@ class AutoGenerate(object):
         from random import randint
         from random import random
         for i in range(edgeSize):
-            sp = randint(0, nodeSize)
-            ep = randint(0, nodeSize)
+            sp = randint(0, nodeSize - 1)
+            ep = randint(0, nodeSize - 1)
             while sp == ep or (sp, ep) in listOfEdge or (ep, sp) in listOfEdge:
-                sp = randint(0, edgeSize)
-                ep = randint(0, edgeSize)
+                sp = randint(0, nodeSize - 1)
+                ep = randint(0, nodeSize - 1)
             # preList.append((sp, ep, random()))
             preList += '%d\t%d\t%f\n' % (sp, ep, random())
             listOfEdge.append((sp, ep))

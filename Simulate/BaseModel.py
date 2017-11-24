@@ -72,12 +72,13 @@ class BaseModel(object):
             # na = nodelist.index(e._startPoint)
             nb = filter(lambda x: x._value == e._endPoint, self._nodelist)[0]
             # nb = nodelist.index(e._endPoint)
-            try:
-                unionSet.Union(na, nb)
-            except Exception, error:
-                # print error
-                print type(na), type(nb)
-                # print na, nb
+            unionSet.Union(na, nb)
+            # try:
+            #     unionSet.Union(na, nb)
+            # except Exception, error:
+            #     # print error
+            #     print type(na), type(nb)
+            #     # print na, nb
 
         # self._cluster = {}
         #
