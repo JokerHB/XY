@@ -9,7 +9,8 @@ class AutoGenerate(object):
 
     @staticmethod
     def Generate(nodeSize, edgeSize, filepath):
-        preList = ''
+        # preList = ''
+        preList = '%d\t%d\n' % (nodeSize, edgeSize)
         listOfEdge = []
         from random import randint
         from random import random
@@ -38,14 +39,19 @@ class AutoGenerate(object):
         f.close()
         partten = re.compile('(\d+)\t(\d+)\t(0\.\d+)')
         edges = []
-        for l in content:
-            info = partten.match(l)
+        nodeSize = int(re.match('(\d+)\t(\d+)', content[0]).group(1))
+        # print type(re.match('(\d+)\t(\d+)', content[0]).group())
+        edgeSize = int(re.match('(\d+)\t(\d+)', content[0]).group(2))
+        print nodeSize, edgeSize
+        for l in range(1, len(content)):
+            info = partten.match(content[l])
             # print l
             # print info.group(0)
             if info != None:
-                edge = Simulate.MyEdge.MyEdge(info.group(1), info.group(2), info.group(3))
+                # print info.group(1), info.group(2), info.group(3)
+                edge = Simulate.MyEdge.MyEdge(startPoint=info.group(1), endPoint=info.group(2), weight=float(info.group(3)))
                 # edge = Simulate.MyEdge.MyEdge(info.group(2), info.group(1), info.group(3))
                 edges.append(edge)
                 # print info.group(1), info.group(2), info.group(3)
         # print len(edges)
-        return Simulate.BaseModel.BaseModel(edge=edges)
+        return Simulate.BaseModel.BaseModel(edge=edges, nodeSize=nodeSize, edgeSize=edgeSize)

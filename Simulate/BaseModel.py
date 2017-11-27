@@ -4,27 +4,30 @@ from MyEdge import MyEdge
 from copy import deepcopy
 
 class BaseModel(object):
-    def __init__(self, edge):
+    def __init__(self, edge, nodeSize, edgeSize):
         '''
         init function of BaseModel
         '''
 
         self._edge = deepcopy(edge)
-        self._node = []
+        self._node = range(0, nodeSize)
         self._cluster = []
         self._modularity = 0.0
         self._degree = {}
         self._m = 0.0
         self._baseEdge = []
+        self._nodeSize = nodeSize
+        self._edgeSize = edgeSize
 
         for e in self._edge:
-            if e._startPoint not in self._node:
-                self._node.append(e._startPoint)
-            if e._endPoint not in self._node:
-                self._node.append(e._endPoint)
+            # if e._startPoint not in self._node:
+            #     self._node.append(e._startPoint)
+            # if e._endPoint not in self._node:
+            #     self._node.append(e._endPoint)
             self._m += e._weight
             self._baseEdge.append((e._startPoint, e._endPoint))
             self._baseEdge.append((e._endPoint, e._startPoint))
+        self._m += int(self._nodeSize)
         self.UpdateDegree()
 
     def SumWeightOfUV(self, startPoint, endPoint):
@@ -57,6 +60,12 @@ class BaseModel(object):
                 self._degree[e._endPoint] += e._weight
             else:
                 self._degree[e._endPoint] = e._weight
+        for _ in self._node:
+            if _ not in self._degree:
+                self._degree[_] = 1.0
+            else:
+                self._degree[_] += 1.0
+
 
     def UpdateCluster(self):
         import Tool.UnionSet
@@ -68,10 +77,16 @@ class BaseModel(object):
             self._nodelist.append(Tool.UnionSet.BaseNode(value=_))
 
         for e in self._edge:
-            na = filter(lambda x: x._value == e._startPoint, self._nodelist)[0]
+            na = filter(lambda x: int(x._value) == int(e._startPoint), self._nodelist)[0]
             # na = nodelist.index(e._startPoint)
-            nb = filter(lambda x: x._value == e._endPoint, self._nodelist)[0]
+            nb = filter(lambda x: int(x._value) == int(e._endPoint), self._nodelist)[0]
             # nb = nodelist.index(e._endPoint)
+
+            # if len(na) != 0:
+            #     na = na[0]
+            # if len(nb) != 0:
+            #     nb = nb[0]
+
             unionSet.Union(na, nb)
             # try:
             #     unionSet.Union(na, nb)
@@ -115,9 +130,9 @@ class BaseModel(object):
                     # aij = self.SumWeightOfUV(startPoint=i, endPoint=j)
                     if (i, j) in self._baseEdge or (j, i) in self._baseEdge:
                         aij = self.SumWeightOfUV(startPoint=i, endPoint=j)
-                        self._modularity += aij - ((self._degree[i] * self._degree[j]) / (2.0 * self._m))
+                        self._modularity += ((self._degree[i] * self._degree[j]) / (2.0 * self._m)) - aij
                     else:
-                        self._modularity -= ((self._degree[i] * self._degree[j]) / (2.0 * self._m))
+                        self._modularity += ((self._degree[i] * self._degree[j]) / (2.0 * self._m))
         self._modularity /= (2.0 * self._m)
         # print self._modularity
         return self._modularity

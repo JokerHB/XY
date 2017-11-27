@@ -8,7 +8,7 @@ if __name__ == '__main__':
     import Tool.AutoGenerate
 
     filepath = '/Users/joker/Documents/Code/GitHub/XY/Exp/test.txt'
-    Tool.AutoGenerate.AutoGenerate.Generate(nodeSize=10, edgeSize=1, filepath=filepath)
+    Tool.AutoGenerate.AutoGenerate.Generate(nodeSize=10, edgeSize=45, filepath=filepath)
     print 'generate finish'
     graph = Tool.AutoGenerate.AutoGenerate.Import(filepath)
     print graph.GetModularity()
